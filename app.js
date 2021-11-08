@@ -1,3 +1,8 @@
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config()
+}
+
+// 載入所需套件
 const express = require('express')
 const handlebars = require('express-handlebars')
 const flash = require('connect-flash')
@@ -5,7 +10,7 @@ const session = require('express-session')
 const passport = require('./config/passport')
 const methodOverride = require('method-override')
 const app = express()
-const port = 3000
+const PORT = process.env.PORT
 
 // 套件相關settings
 app.engine('hbs', handlebars({ defaultLayout: 'main', extname: '.hbs' })) // Handlebars 註冊樣板引擎
@@ -26,8 +31,8 @@ app.use((req, res, next) => {
   next()
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+app.listen(PORT, () => {
+  console.log(`Example app listening at http://localhost:${PORT}`)
 })
 
 require('./routes')(app, passport)
