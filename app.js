@@ -14,7 +14,7 @@ const app = express()
 const PORT = process.env.PORT
 
 // 套件相關settings
-app.engine('hbs', handlebars({ defaultLayout: 'main', extname: '.hbs' })) // Handlebars 註冊樣板引擎
+app.engine('hbs', handlebars({ defaultLayout: 'main', extname: '.hbs', helpers: require('./config/handlebars-helpers') }))
 app.set('view engine', 'hbs')
 
 app.use(express.urlencoded({ extended: true }))
