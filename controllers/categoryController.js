@@ -8,18 +8,40 @@ const categoryController = {
       raw: true,
       nest: true
     }).then(categories => {
-      res.render('admin/categories', { categories })
+      if (req.params.id) {
+        Category.findByPk(req.params.id)
+          .then(category => {
+            return res.render('admin/categories', { categories, category: category.toJSON() })
+          })
+      } else {
+        return res.render('admin/categories', { categories })
+      }
     })
   },
 
   postCategories: (req, res) => {
     if (!req.body.name) {
-      req.flash('error_messages', '輸入分類不存在')
+      req.flash('error_messages', '未輸入分類名稱')
       return res.redirect('back')
     } else {
       Category.create({ name: req.body.name })
         .then(category => {
           res.redirect('/admin/categories')
+        })
+    }
+  },
+
+  putCategory: (req, res) => {
+    if (!req.body.name) {
+      req.flash('error_messages', '未輸入分類名稱')
+      return res.redirect('back')
+    } else {
+      Category.findByPk(req.params.id)
+        .then(category => {
+          category.update(req.body)
+            .then(category => {
+              res.redirect('/admin/categories')
+            })
         })
     }
   },
