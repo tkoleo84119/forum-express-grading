@@ -9,9 +9,16 @@ const restController = {
       .then(restaurants => {
         for (let restaurant of restaurants) {
           restaurant.description = restaurant.description.substring(0, 50),
-          restaurant.categoryName = restaurant.Category.name
+            restaurant.categoryName = restaurant.Category.name
         }
-        return res.render('restaurants', {restaurants})
+        return res.render('restaurants', { restaurants })
+      })
+  },
+
+  getRestaurant: (req, res) => {
+    Restaurant.findByPk(req.params.id, { include: [Category] })
+      .then(restaurant => {
+        return res.render('restaurant', { restaurant: restaurant.toJSON() })
       })
   }
 }
