@@ -1,0 +1,14 @@
+<div class="container">
+  <div class="card mt-1">
+    <div class="d-flex">
+      <img class="m-4" src="{{user.image}}" style="width: 250px; height: 250px; border-radius:50%"
+        onerror="this.src='https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg';this.onerror = null">
+      <div class="mt-4 ml-2">
+        <h2>{{user.name}}</h2>
+        <p>{{user.email}}</p>
+        {{#ifCond user.id loginUser.id}}
+        <a href="/users/{{user.id}}/edit" class="btn btn-primary">edit</a>
+        {{/ifCond}}
+      </div>
+    </div>
+  </div>

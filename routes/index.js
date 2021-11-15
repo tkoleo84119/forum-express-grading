@@ -61,4 +61,9 @@ module.exports = (app, passport) => {
   // comment routes setting
   app.post('/comments', authenticated, commentController.postComment)
   app.delete('/comments/:id', authenticatedAdmin, commentController.deleteComment) // 只有admin可以刪留言
+
+  // profile routes setting
+  app.get('/users/:id', authenticated, userController.getUser)
+  app.get('/users/:id/edit', authenticated, userController.editUser)
+  app.put('/users/:id', authenticated, upload.single('image'), userController.putUser)
 }
