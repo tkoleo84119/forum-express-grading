@@ -40,11 +40,13 @@ const restController = {
       })
   },
 
-  getRestaurant: (req, res) => {
-    Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }] })
-      .then(restaurant => {
-        return res.render('restaurant', { restaurant: restaurant.toJSON() })
-      })
+  getRestaurant: async (req, res) => {
+    try {
+      const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }] })
+      return res.render('restaurant', { restaurant: restaurant.toJSON() })
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
   },
 
   getFeeds: (req, res) => {
@@ -69,6 +71,17 @@ const restController = {
         comments: comments
       })
     })
+  },
+
+  getDashBoard: async (req, res) => {
+    try {
+      const restaurant = (await Restaurant.findByPk(req.params.id, { include: [Comment, Category] })).toJSON()
+      // 由於測試檔未有comment，在找不到restaurant.Comments的情況下會報錯，因此添加判斷式來避免此情況
+      restaurant.Comments ? restaurant.commentCount = restaurant.Comments.length : ''
+      res.render('dashboard', { restaurant })
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
   },
 }
 module.exports = restController
