@@ -5,6 +5,7 @@ const db = require('../models')
 const User = db.User
 const Comment = db.Comment
 const Restaurant = db.Restaurant
+const Favorite = db.Favorite
 const helpers = require('../_helpers')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
@@ -133,6 +134,33 @@ const userController = {
         req.flash('success_messages', '使用者資料編輯成功')
         res.redirect(`/users/${user.id}`)
       }
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
+  },
+
+  addFavorite: async (req, res) => {
+    try {
+      await Favorite.create({
+        UserId: helpers.getUser(req).id,
+        RestaurantId: req.params.restaurantId
+      })
+      return res.redirect('back')
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
+  },
+
+  removeFavorite: async (req, res) => {
+    try {
+      const favorite = await Favorite.findOne({
+        where: {
+          UserId: helpers.getUser(req).id,
+          RestaurantId: req.params.restaurantId
+        }
+      })
+      await favorite.destroy()
+      return res.redirect('back')
     } catch (err) {
       return res.render('errorPage', { layout: false, error: err.message })
     }
