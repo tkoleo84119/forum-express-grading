@@ -43,6 +43,7 @@ const restController = {
   getRestaurant: async (req, res) => {
     try {
       const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }] })
+      await restaurant.increment('viewCounts') // 自動為viewCounts增加1
       return res.render('restaurant', { restaurant: restaurant.toJSON() })
     } catch (err) {
       return res.render('errorPage', { layout: false, error: err.message })
@@ -84,4 +85,5 @@ const restController = {
     }
   },
 }
+
 module.exports = restController
