@@ -106,11 +106,13 @@ const userController = {
         res.redirect('back')
       }
 
-      // 確認email在資料庫沒有重複(利用[Op.not]排除修改者本身的email，以排除未修改的狀況)
-      const emailCheck = await User.findOne({ where: { email: req.body.email, [Op.not]: { id: req.params.id } } })
-      if (emailCheck) {
-        req.flash('error_messages', "此email已註冊過")
-        res.redirect('back')
+      // 確認email在資料庫沒有重複
+      if (helpers.getUser(req).email !== req.body.email) {
+        const emailCheck = await User.findOne({ where: { email: req.body.email } })
+        if (JSON.stringify(emailCheck) !== '{}') {
+          req.flash('error_messages', "此email已註冊過")
+          return res.redirect('back')
+        }
       }
 
       const { file } = req
