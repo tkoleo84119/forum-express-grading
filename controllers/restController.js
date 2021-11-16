@@ -5,6 +5,7 @@ const Category = db.Category
 const Comment = db.Comment
 const User = db.User
 const pageLimit = 10 // 每頁幾筆資料
+const helpers = require('../_helpers')
 
 const restController = {
   getRestaurants: (req, res) => {
@@ -32,6 +33,7 @@ const restController = {
         for (let restaurant of restaurants) {
           restaurant.description = restaurant.description.substring(0, 50)
           restaurant.categoryName = restaurant.Category.name
+          restaurant.isFavorited = helpers.getUser(req).FavoritedRestaurants.filter(Favorite => Favorite.id === restaurant.id)
         }
         Category.findAll({ raw: true, nest: true })
           .then(categories => {
@@ -42,9 +44,10 @@ const restController = {
 
   getRestaurant: async (req, res) => {
     try {
-      const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }] })
+      const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }, { model: User, as: 'FavoritedUsers' }] })
       await restaurant.increment('viewCounts') // 自動為viewCounts增加1
-      return res.render('restaurant', { restaurant: restaurant.toJSON() })
+      const isFavorited = restaurant.FavoritedUsers.filter(Favorite => Favorite.id === helpers.getUser(req).id)
+      return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited })
     } catch (err) {
       return res.render('errorPage', { layout: false, error: err.message })
     }
