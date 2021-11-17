@@ -7,6 +7,7 @@ const Comment = db.Comment
 const Restaurant = db.Restaurant
 const Favorite = db.Favorite
 const Like = db.Like
+const Followship = db.Followship
 const helpers = require('../_helpers')
 const imgur = require('imgur-node-api')
 const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
@@ -170,32 +171,71 @@ const userController = {
   },
 
   addLike: async (req, res) => {
-    await Like.create({
-      UserId: helpers.getUser(req).id,
-      RestaurantId: req.params.restaurantId
-    })
-    return res.redirect('back')
+    try {
+      await Like.create({
+        UserId: helpers.getUser(req).id,
+        RestaurantId: req.params.restaurantId
+      })
+      return res.redirect('back')
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
   },
 
   removeLike: async (req, res) => {
-    await Like.destroy({
-      where: {
-        UserId: helpers.getUser(req).id,
-        RestaurantId: req.params.restaurantId
-      }
-    })
-    return res.redirect('back')
+    try {
+      await Like.destroy({
+        where: {
+          UserId: helpers.getUser(req).id,
+          RestaurantId: req.params.restaurantId
+        }
+      })
+      return res.redirect('back')
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
   },
 
   getTopUser: async (req, res) => {
-    let users = await User.findAll({ raw: true, nest: true, include: [{ model: User, as: 'Followers' }] })
-    for (let user of users) {
-      user.FollowerCount = user.Followers.length
-      user.isFollowed = helpers.getUser(req).Followers.filter(follower => follower.id === user.id)
+    try {
+      let users = await User.findAll({ include: [{ model: User, as: 'Followers' }] })
+      users = users.map(user => ({
+        ...user.dataValues,
+        FollowerCount: user.Followers.length,
+        isFollowed: helpers.getUser(req).Followings.filter(follower => follower.id === user.id)
+      }))
+      users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
+      return res.render('topUser', { users })
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
     }
-    users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
-    return res.render('topUser', { users })
-  }
+  },
+
+  addFollowing: async (req, res) => {
+    try {
+      await Followship.create({
+        followerId: helpers.getUser(req).id,
+        followingId: req.params.userId
+      })
+      return res.redirect('back')
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
+  },
+
+  removeFollowing: async (req, res) => {
+    try {
+      await Followship.destroy({
+        where: {
+          followerId: helpers.getUser(req).id,
+          followingId: req.params.userId
+        }
+      })
+      return res.redirect('back')
+    } catch (err) {
+      return res.render('errorPage', { layout: false, error: err.message })
+    }
+  },
 }
 
 // userController export
