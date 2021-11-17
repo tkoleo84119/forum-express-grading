@@ -157,13 +157,12 @@ const userController = {
 
   removeFavorite: async (req, res) => {
     try {
-      const favorite = await Favorite.findOne({
+      await Favorite.destroy({
         where: {
-          UserId: helpers.getUser(req).id,
+          UserId: req.user.id, // 不知為何改成helpers.getUser(req).id就過不了測試檔
           RestaurantId: req.params.restaurantId
         }
       })
-      await favorite.destroy()
       return res.redirect('back')
     } catch (err) {
       return res.render('errorPage', { layout: false, error: err.message })
