@@ -111,7 +111,7 @@ const userController = {
         const emailCheck = await User.findOne({ where: { email: req.body.email } })
         if (JSON.stringify(emailCheck) !== '{}') {
           req.flash('error_messages', "此email已註冊過")
-          return res.redirect('back')
+          res.redirect('back')
         }
       }
 
