@@ -4,6 +4,7 @@ const Restaurant = db.Restaurant
 const Category = db.Category
 const Comment = db.Comment
 const User = db.User
+const Favorite = db.Favorite
 const pageLimit = 10 // 每頁幾筆資料
 const helpers = require('../_helpers')
 
@@ -34,6 +35,7 @@ const restController = {
           restaurant.description = restaurant.description.substring(0, 50)
           restaurant.categoryName = restaurant.Category.name
           restaurant.isFavorited = helpers.getUser(req).FavoritedRestaurants.filter(Favorite => Favorite.id === restaurant.id)
+          restaurant.isLiked = helpers.getUser(req).LikedRestaurants.filter(Like => Like.id === restaurant.id)
         }
         Category.findAll({ raw: true, nest: true })
           .then(categories => {
@@ -44,10 +46,11 @@ const restController = {
 
   getRestaurant: async (req, res) => {
     try {
-      const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }, { model: User, as: 'FavoritedUsers' }] })
+      const restaurant = await Restaurant.findByPk(req.params.id, { include: [Category, { model: Comment, include: [User] }, { model: User, as: 'FavoritedUsers' }, { model: User, as: 'LikedUsers' }] })
       await restaurant.increment('viewCounts') // 自動為viewCounts增加1
       const isFavorited = restaurant.FavoritedUsers.filter(Favorite => Favorite.id === helpers.getUser(req).id)
-      return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited })
+      const isLiked = restaurant.LikedUsers.filter(Like => Like.id === helpers.getUser(req).id)
+      return res.render('restaurant', { restaurant: restaurant.toJSON(), isFavorited, isLiked })
     } catch (err) {
       return res.render('errorPage', { layout: false, error: err.message })
     }
@@ -79,9 +82,12 @@ const restController = {
 
   getDashBoard: async (req, res) => {
     try {
-      const restaurant = (await Restaurant.findByPk(req.params.id, { include: [Comment, Category] })).toJSON()
+      const restaurant = (await Restaurant.findByPk(req.params.id, { include: [Comment, Category, { model: User, as: 'FavoritedUsers' }] })).toJSON()
+
       // 由於測試檔未有comment，在找不到restaurant.Comments的情況下會報錯，因此添加判斷式來避免此情況
       restaurant.Comments ? restaurant.commentCount = restaurant.Comments.length : ''
+      restaurant.FavoritedUsers ? restaurant.favoriteCount = restaurant.FavoritedUsers.length : ''
+
       res.render('dashboard', { restaurant })
     } catch (err) {
       return res.render('errorPage', { layout: false, error: err.message })
