@@ -102,6 +102,12 @@ const userController = {
 
   putUser: async (req, res) => {
     try {
+      // 登入的使用者id和req.params.若不相同(代表是修改id進入)，導回上一頁，確保只有自己能修改自己的資料
+      if (helpers.getUser(req).id !== Number(req.params.id)) {
+        req.flash('error_messages', "無法變更他人Profile")
+        res.redirect('back')
+      }
+
       // 確保name和email皆有輸入
       if (!req.body.name || !req.body.email) {
         req.flash('error_messages', "name或email尚未輸入")
@@ -113,7 +119,7 @@ const userController = {
         const emailCheck = await User.findOne({ where: { email: req.body.email } })
         if (JSON.stringify(emailCheck) !== '{}') {
           req.flash('error_messages', "此email已註冊過")
-          res.redirect('back')
+          return res.redirect('back')
         }
       }
 
