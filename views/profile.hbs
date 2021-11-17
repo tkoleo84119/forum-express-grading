@@ -1,28 +1,87 @@
-<div class="container">
-  <div class="card mt-1">
-    <div class="d-flex">
-      <img class="m-4" src="{{user.image}}" style="width: 250px; height: 250px; border-radius:50%"
-        onerror="this.src='https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg';this.onerror = null">
-      <div class="mt-4 ml-2">
-        <h2>{{user.name}}</h2>
-        <p>{{user.email}}</p>
-        <p><b>{{user.commentCount}}</b> 已評論餐廳</p>
-        {{#ifCond user.id loginUser.id}}
-        <a href="/users/{{user.id}}/edit" class="btn btn-primary">edit</a>
-        {{/ifCond}}
+<div class="container row">
+
+  <div class="col-md-12">
+    <div class="card mt-1">
+      <div class="d-flex">
+        <img class="m-4" src="{{user.image}}" style="width: 250px; height: 250px; border-radius:50%"
+          onerror="this.src='https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg';this.onerror = null">
+        <div class="mt-4 ml-2">
+          <h2>{{user.name}}</h2>
+          <p>{{user.email}}</p>
+          <p style="line-height: 10px"><b>{{#count user.Comments}}{{/count}}</b> 已評論餐廳</p>
+          <p style="line-height: 10px"><b>{{#count user.FavoritedRestaurants}}{{/count}}</b> 收藏的餐廳</p>
+          <p style="line-height: 10px"><b>{{#count user.Followings}}{{/count}}</b> followings (追蹤者)</p>
+          <p style="line-height: 10px"><b>{{#count user.Followers}}{{/count}}</b> followers (追隨者)</p>
+          {{#ifCond user.id loginUser.id}}
+          <a href="/users/{{user.id}}/edit" class="btn btn-primary">edit</a>
+          {{/ifCond}}
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="card mt-3">
-    <div class="card-header"><b>{{user.commentCount}}</b>
-      已評論餐廳</div>
-    <div class="card-body">
-      {{#each user.Comments}}
-      <a href="/restaurants/{{this.Restaurant.id}}">
-        <img class="mx-2" src="{{this.Restaurant.image}}" style="width: 70px; height: 70px">
-      </a>
-      {{/each}}
+  <div class="col-md-4">
+    <div class="card mt-3">
+      <div class="card-header"><b>{{#count user.Followings}}{{/count}}</b>
+        followings (追蹤者)
+      </div>
+      <div class="card-body">
+        {{#each user.Followings}}
+        <a href="/users/{{this.id}}">
+          <img class="mx-2" src="{{this.image}}" style="width: 70px; height: 70px" onerror="this.src='https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg';this.onerror = null">
+        </a>
+        {{/each}}
+      </div>
     </div>
   </div>
+
+  <div class="col-md-8">
+    <div class="card mt-3">
+      <div class="card-header"><b>{{#count user.Comments}}{{/count}}</b>
+        已評論餐廳
+      </div>
+      <div class="card-body">
+        {{#each user.Comments}}
+        <a href="/restaurants/{{this.Restaurant.id}}">
+          <img class="mx-2" src="{{this.Restaurant.image}}" style="width: 70px; height: 70px">
+        </a>
+        {{/each}}
+      </div>
+    </div>
   </div>
+
+  <div class="col-md-4">
+    <div class="card mt-3">
+      <div class="card-header"><b>{{#count user.Followers}}{{/count}}</b>
+        followers (追隨者)
+      </div>
+      <div class="card-body">
+        {{#each user.Followers}}
+        <a href="/users/{{this.id}}">
+          <img class="mx-2" src="{{this.image}}" style="width: 70px; height: 70px" onerror="this.src='https://apsec.iafor.org/wp-content/uploads/sites/37/2017/02/IAFOR-Blank-Avatar-Image.jpg';this.onerror = null">
+        </a>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="card mt-3">
+      <div class="card-header"><b>{{#count user.FavoritedRestaurants}}{{/count}}</b>
+        收藏的餐廳
+      </div>
+      <div class="card-body">
+        {{#each user.FavoritedRestaurants}}
+        <a href="/restaurants/{{this.id}}">
+          <img class="mx-2" src="{{this.image}}" style="width: 70px; height: 70px">
+        </a>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+
+

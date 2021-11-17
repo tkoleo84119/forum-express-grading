@@ -73,12 +73,19 @@ const userController = {
   getUser: async (req, res) => {
     try {
       const user = (await User.findByPk(req.params.id,
-        { include: { model: Comment, include: { model: Restaurant, attribute: ['id', 'image'] } } }
+        {
+          include: [
+            { model: Comment, include: { model: Restaurant, attribute: ['id', 'image'] } },
+            { model: User, as: 'Followings' },
+            { model: User, as: 'Followers' },
+            { model: Restaurant, as: 'FavoritedRestaurants' }
+          ]
+        }
       )).toJSON()
 
-      // 因應測試檔若user.Comments不存在，執行removeDBLComment會報錯，因此新增判斷式
-      user.Comments ? user.Comments = removeDBLComment(user.Comments) : ''
-      user.Comments ? user.commentCount = user.Comments.length : ''
+      if (user.Comments) {
+        user.Comments = removeDBLComment(user.Comments)
+      }
 
       return res.render('profile', { user })
     } catch (err) {
