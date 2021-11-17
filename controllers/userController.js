@@ -185,6 +185,16 @@ const userController = {
       }
     })
     return res.redirect('back')
+  },
+
+  getTopUser: async (req, res) => {
+    let users = await User.findAll({ raw: true, nest: true, include: [{ model: User, as: 'Followers' }] })
+    for (let user of users) {
+      user.FollowerCount = user.Followers.length
+      user.isFollowed = helpers.getUser(req).Followers.filter(follower => follower.id === user.id)
+    }
+    users = users.sort((a, b) => b.FollowerCount - a.FollowerCount)
+    return res.render('topUser', { users })
   }
 }
 
