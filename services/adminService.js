@@ -8,12 +8,25 @@ const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const adminService = {
   getRestaurants: async (req, res, callback) => {
-    const restaurants = await Restaurant.findAll({
-      raw: true,
-      nest: true,
-      include: [Category]
-    })
-    callback({ restaurants })
+    try {
+      const restaurants = await Restaurant.findAll({
+        raw: true,
+        nest: true,
+        include: [Category]
+      })
+      callback({ restaurants })
+    } catch (err) {
+      console.log(err)
+    }
+  },
+
+  getRestaurant: async (req, res, callback) => {
+    try {
+      const restaurant = (await Restaurant.findByPk(req.params.id, { include: [Category] })).toJSON()
+      callback({ restaurant })
+    } catch (err) {
+      console.log(err)
+    }
   },
 }
 
