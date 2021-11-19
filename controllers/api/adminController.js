@@ -1,6 +1,4 @@
-const db = require('../../models')
-const Restaurant = db.Restaurant
-const Category = db.Category
+// 載入所需套件
 const adminService = require('../../services/adminService')
 
 const adminController = {
