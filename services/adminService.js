@@ -29,6 +29,37 @@ const adminService = {
     }
   },
 
+  postRestaurant: async (req, res, callback) => {
+    try {
+      if (!req.body.name) {
+        callback({ status: 'error', message: "name didn't exist" })
+      }
+
+      const { file } = req
+      if (file) {
+        imgur.setClientID(IMGUR_CLIENT_ID);
+        imgur.upload(file.path, async (err, img) => {
+          await Restaurant.create({
+            ...req.body,
+            image: file ? img.data.link : null,
+            CategoryId: req.body.categoryId
+          })
+          callback({ status: 'success', message: 'restaurant was successfully created' })
+        })
+      }
+      else {
+        await Restaurant.create({
+          ...req.body,
+          image: null,
+          CategoryId: req.body.categoryId
+        })
+        callback({ status: 'success', message: 'restaurant was successfully created' })
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  },
+
   deleteRestaurant: async (req, res, callback) => {
     try {
       await Restaurant.destroy({ where: { id: req.params.id } })
