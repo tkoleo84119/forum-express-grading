@@ -16,6 +16,19 @@ const categoryService = {
       console.log(err)
     }
   },
+
+  postCategories: async (req, res, callback) => {
+    try {
+      if (!req.body.name) {
+        callback({ status: 'error', message: '未數入類別名稱' })
+      } else {
+        await Category.create({ name: req.body.name })
+        callback({ status: 'success', message: '' })
+      }
+    } catch (err) {
+      console.log(err)
+    }
+  },
 }
 
 // categoryService exports

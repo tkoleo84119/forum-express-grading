@@ -11,15 +11,13 @@ const categoryController = {
   },
 
   postCategories: (req, res) => {
-    if (!req.body.name) {
-      req.flash('error_messages', '未輸入分類名稱')
-      return res.redirect('back')
-    } else {
-      Category.create({ name: req.body.name })
-        .then(category => {
-          res.redirect('/admin/categories')
-        })
-    }
+    categoryService.postCategories(req, res, data => {
+      if (data.status === 'error') {
+        req.flash('error_messages', data.message)
+        return res.redirect('back')
+      }
+      return res.redirect('/admin/categories')
+    })
   },
 
   putCategory: (req, res) => {
