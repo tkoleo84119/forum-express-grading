@@ -42,6 +42,15 @@ const categoryService = {
       console.log(err)
     }
   },
+
+  deleteCategory: async (req, res, callback) => {
+    try {
+      await Category.destroy({ where: { id: req.params.id } })
+      callback({ status: 'success', message: '' })
+    } catch (err) {
+      console.log(err)
+    }
+  }
 }
 
 // categoryService exports
