@@ -5,6 +5,11 @@ const bcrypt = require('bcryptjs')
 const db = require('../models')
 const User = db.User
 const Restaurant = db.Restaurant
+const jwt = require('jsonwebtoken')
+const passportJwt = require('passport-jwt')
+const ExtractJwt = passportJwt.ExtractJwt
+const JwtStrategy = passportJwt.Strategy
+
 
 // LocalStrategy settings
 passport.use(new LocalStrategy({
@@ -37,6 +42,26 @@ passport.deserializeUser((id, done) => {
       return done(null, user)
     })
 })
+
+// JWT
+let jwtOptions = {}
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken()
+jwtOptions.secretOrKey = process.env.JWT_SECRET
+
+let strategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
+  User.findByPk(jwt_payload.id, {
+    include: [
+      { model: Restaurant, as: 'FavoritedRestaurants' },
+      { model: Restaurant, as: 'LikedRestaurants' },
+      { model: User, as: 'Followers' },
+      { model: User, as: 'Followings' }
+    ]
+  }).then(user => {
+    if (!user) return next(null, false)
+    return next(null, user)
+  })
+})
+passport.use(strategy)
 
 // passport exports
 module.exports = passport
