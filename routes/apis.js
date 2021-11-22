@@ -3,8 +3,12 @@ const express = require('express')
 const router = express.Router()
 const adminController = require('../controllers/api/adminController')
 const categoryController = require('../controllers/api/categoryController')
+const userController = require('../controllers/api/userController')
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
+
+// JWT signin routes setting
+router.post('/signin', userController.signIn)
 
 // admin routes setting
 router.get('/admin/restaurants', adminController.getRestaurants)
