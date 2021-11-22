@@ -3,11 +3,27 @@ const bcrypt = require('bcryptjs')
 const db = require('../../models')
 const User = db.User
 const jwt = require('jsonwebtoken')
-const passportJWT = require('passport-jwt')
-const ExtractJwt = passportJWT.ExtractJwt
-const JwtStrategy = passportJWT.Strategy
 
 let userController = {
+  signUp: async (req, res) => {
+
+    if (req.body.passwordCheck !== req.body.password) {
+      return res.json({ status: 'error', message: '兩次密碼輸入不同！' })
+    } else {
+      const user = await User.findOne({ where: { email: req.body.email } })
+      if (user) {
+        return res.json({ status: 'error', message: '此信箱已註冊過！' })
+      } else {
+        await User.create({
+          name: req.body.name,
+          email: req.body.email,
+          password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10), null)
+        })
+        return res.json({ status: 'success', message: '成功註冊帳號！' })
+      }
+    }
+  },
+
   signIn: async (req, res) => {
     if (!req.body.email || !req.body.password) {
       return res.json({ status: 'error', message: "required fields didn't exist" })
@@ -25,7 +41,7 @@ let userController = {
     }
 
     const payload = { id: user.id }
-    const token = jwt.sign(payload, process.env.JWT_SECRET)
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1m' }) // expiresIn自動在payload中新增exp(Token多久過期)
     return res.json({
       status: 'success',
       message: 'ok',

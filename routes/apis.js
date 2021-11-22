@@ -20,6 +20,7 @@ const authenticatedAdmin = (req, res, next) => {
 
 // JWT signin routes setting
 router.post('/signin', userController.signIn)
+router.post('/signup', userController.signUp)
 
 // admin routes setting
 router.get('/admin/restaurants', authenticated, authenticatedAdmin, adminController.getRestaurants)
