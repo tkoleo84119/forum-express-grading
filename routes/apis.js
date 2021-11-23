@@ -4,6 +4,7 @@ const router = express.Router()
 const adminController = require('../controllers/api/adminController')
 const categoryController = require('../controllers/api/categoryController')
 const userController = require('../controllers/api/userController')
+const restController = require('../controllers/api/restController')
 const passport = require('../config/passport')
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
@@ -40,6 +41,13 @@ router.get('/admin/categories/:id', authenticated, authenticatedAdmin, categoryC
 router.post('/admin/categories', authenticated, authenticatedAdmin, categoryController.postCategories)
 router.put('/admin/categories/:id', authenticated, authenticatedAdmin, categoryController.putCategory)
 router.delete('/admin/categories/:id', authenticated, authenticatedAdmin, categoryController.deleteCategory)
+
+// restaurant routes setting
+router.get('/restaurants', authenticated, restController.getRestaurants)
+router.get('/restaurants/feeds', authenticated, restController.getFeeds)
+router.get('/restaurants/top', authenticated, restController.getTopRestaurant)
+router.get('/restaurants/:id', authenticated, restController.getRestaurant)
+router.get('/restaurants/:id/dashboard', authenticated, restController.getDashBoard)
 
 // router exports
 module.exports = router
