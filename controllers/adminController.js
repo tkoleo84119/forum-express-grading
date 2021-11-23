@@ -1,28 +1,22 @@
 // 載入所需套件
-const db = require('../models')
-const Restaurant = db.Restaurant
-const Category = db.Category
-const User = db.User
-const imgur = require('imgur-node-api')
-const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
+const { Restaurant, Category } = require('../models')
 const adminService = require('../services/adminService')
 
 const adminController = {
+  // 後台瀏覽全部餐廳
   getRestaurants: (req, res) => {
     adminService.getRestaurants(req, res, data => {
       return res.render('admin/restaurants', data)
     })
   },
 
-  createRestaurant: (req, res) => {
-    Category.findAll({
-      raw: true,
-      nest: true
-    }).then(categories => {
-      return res.render('admin/create', { categories })
-    })
+  // 渲染餐廳新增頁面
+  createRestaurant: async (req, res) => {
+    const categories = await Category.findAll({ raw: true, nest: true })
+    return res.render('admin/create', { categories })
   },
 
+  // 後台新增餐廳資料
   postRestaurant: (req, res) => {
     adminService.postRestaurant(req, res, data => {
       if (data.status === 'error') {
@@ -34,23 +28,21 @@ const adminController = {
     })
   },
 
+  // 後台瀏覽單一餐廳
   getRestaurant: (req, res) => {
     adminService.getRestaurant(req, res, data => {
       return res.render('admin/restaurant', data)
     })
   },
 
-  editRestaurant: (req, res) => {
-    Category.findAll({
-      raw: true,
-      nest: true
-    }).then(categories => {
-      return Restaurant.findByPk(req.params.id).then(restaurant => {
-        return res.render('admin/create', { categories, restaurant: restaurant.toJSON() })
-      })
-    })
+  // 渲染餐廳編輯頁面
+  editRestaurant: async (req, res) => {
+    const categories = await Category.findAll({ raw: true, nest: true })
+    const restaurant = (await Restaurant.findByPk(req.params.id)).toJSON()
+    return res.render('admin/create', { categories, restaurant })
   },
 
+  // 後台編輯餐廳資料
   putRestaurant: (req, res) => {
     adminService.putRestaurant(req, res, data => {
       if (data.status === 'error') {
@@ -62,6 +54,7 @@ const adminController = {
     })
   },
 
+  // 後台刪除餐廳資料
   deleteRestaurant: (req, res) => {
     adminService.deleteRestaurant(req, res, data => {
       if (data.status === 'success') {
@@ -70,25 +63,24 @@ const adminController = {
     })
   },
 
+  // 後台瀏覽全部使用者
   getUsers: (req, res) => {
-    return User.findAll({ raw: true }).then(users => {
-      return res.render('admin/users', { users })
+    adminService.getUsers(req, res, data => {
+      return res.render('admin/users', data)
     })
   },
 
+  // 後台轉換使用者權限
   toggleAdmin: (req, res) => {
-    const id = req.params.id
-    return User.findByPk(id).then(user => {
-      if (user.email === 'root@example.com') {
-        req.flash('error_messages', '禁止變更管理者權限')
+    adminService.toggleAdmin(req, res, data => {
+      if (data.status === 'error') {
+        req.flash('error_messages', data.message)
         return res.redirect('back')
       }
-      const isAdmin = !user.isAdmin
-      user.update({ isAdmin })
-      req.flash('success_messages', '使用者權限變更成功')
+      req.flash('success_messages', data.message)
       return res.redirect('/admin/users')
     })
-  },
+  }
 }
 
 module.exports = adminController

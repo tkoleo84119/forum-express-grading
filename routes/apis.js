@@ -8,6 +8,7 @@ const passport = require('../config/passport')
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
 
+// 驗證相關設定
 const authenticated = passport.authenticate('jwt', { session: false })
 const authenticatedAdmin = (req, res, next) => {
   if (req.user) {
@@ -22,14 +23,18 @@ const authenticatedAdmin = (req, res, next) => {
 router.post('/signin', userController.signIn)
 router.post('/signup', userController.signUp)
 
-// admin routes setting
+// admin restaurants routes setting
 router.get('/admin/restaurants', authenticated, authenticatedAdmin, adminController.getRestaurants)
 router.get('/admin/restaurants/:id', authenticated, authenticatedAdmin, adminController.getRestaurant)
 router.post('/admin/restaurants', authenticated, authenticatedAdmin, upload.single('image'), adminController.postRestaurant)
 router.put('/admin/restaurants/:id', authenticated, authenticatedAdmin, upload.single('image'), adminController.putRestaurant)
 router.delete('/admin/restaurants/:id', authenticated, authenticatedAdmin, adminController.deleteRestaurant)
 
-// category routes setting
+// admin users routes setting
+router.get('/admin/users', authenticated, authenticatedAdmin, adminController.getUsers)
+router.post('/admin/users/:id', authenticated, authenticatedAdmin, adminController.toggleAdmin)
+
+// admin categories routes setting
 router.get('/admin/categories', authenticated, authenticatedAdmin, categoryController.getCategories)
 router.get('/admin/categories/:id', authenticated, authenticatedAdmin, categoryController.getCategories)
 router.post('/admin/categories', authenticated, authenticatedAdmin, categoryController.postCategories)

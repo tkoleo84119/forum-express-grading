@@ -1,8 +1,8 @@
 // 載入所需套件
-const db = require('../models')
-const Category = db.Category
+const { Category } = require('../models')
 
 const categoryService = {
+  // 後台瀏覽全部餐廳分類
   getCategories: async (req, res, callback) => {
     try {
       const categories = await Category.findAll({ raw: true, nest: true })
@@ -17,6 +17,7 @@ const categoryService = {
     }
   },
 
+  // 後台新增餐廳分類
   postCategories: async (req, res, callback) => {
     try {
       if (!req.body.name) {
@@ -30,6 +31,7 @@ const categoryService = {
     }
   },
 
+  // 後台修改餐廳分類
   putCategory: async (req, res, callback) => {
     try {
       if (!req.body.name) {
@@ -43,6 +45,7 @@ const categoryService = {
     }
   },
 
+  // 後台刪除餐廳分類
   deleteCategory: async (req, res, callback) => {
     try {
       await Category.destroy({ where: { id: req.params.id } })
