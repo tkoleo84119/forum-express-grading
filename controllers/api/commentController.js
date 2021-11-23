@@ -1,22 +1,18 @@
 // 載入所需套件
-const commentService = require('../services/commentService')
+const commentService = require('../../services/commentService')
 
 const commentController = {
   // 新增留言
   postComment: (req, res) => {
     commentService.postComment(req, res, data => {
-      if (data.status === 'success') {
-        return res.redirect(`/restaurants/${req.body.restaurantId}`)
-      }
+      return res.json(data)
     })
   },
 
   // 刪除留言
   deleteComment: (req, res) => {
     commentService.deleteComment(req, res, data => {
-      if (data.status === 'success') {
-        return res.redirect('back')
-      }
+      return res.json(data)
     })
   },
 }

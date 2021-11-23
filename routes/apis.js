@@ -5,6 +5,7 @@ const adminController = require('../controllers/api/adminController')
 const categoryController = require('../controllers/api/categoryController')
 const userController = require('../controllers/api/userController')
 const restController = require('../controllers/api/restController')
+const commentController = require('../controllers/api/commentController')
 const passport = require('../config/passport')
 const multer = require('multer')
 const upload = multer({ dest: 'temp/' })
@@ -48,6 +49,10 @@ router.get('/restaurants/feeds', authenticated, restController.getFeeds)
 router.get('/restaurants/top', authenticated, restController.getTopRestaurant)
 router.get('/restaurants/:id', authenticated, restController.getRestaurant)
 router.get('/restaurants/:id/dashboard', authenticated, restController.getDashBoard)
+
+// comment routes setting
+router.post('/comments', authenticated, commentController.postComment)
+router.delete('/comments/:id', authenticated, authenticatedAdmin, commentController.deleteComment) // 只有admin可以刪留言
 
 // router exports
 module.exports = router
